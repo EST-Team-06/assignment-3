@@ -16,8 +16,7 @@ public class OrderTracker {
         if (latestUpdate != null) {
             dashboardService.updateStatus(orderId, latestUpdate.getStatus());
             if (latestUpdate.isDelivered()) {
-                alertService.sendCustomerAlert(orderId,
-                        "Your order has been delivered: " + latestUpdate.getMilestoneName());
+                alertService.sendCustomerAlert(orderId, latestUpdate.getDeliveredMessage());
             }
         } else {
             handleTrackingFailure(orderId);

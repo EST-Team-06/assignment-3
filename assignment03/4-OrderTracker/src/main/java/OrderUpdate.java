@@ -21,6 +21,8 @@ public class OrderUpdate {
         return milestoneName;
     }
 
+    public String getDeliveredMessage() {return "Your order has been delivered: " + milestoneName; }
+
     public boolean isDelivered() {
         return status == OrderStatus.DELIVERED;
     }
