@@ -29,9 +29,22 @@ public class NewsAggregator {
         if (cachedArticles != null && !cachedArticles.isEmpty()) {
             return cachedArticles;
         }
+
+        if (!newsAPI.isAvailable()) {
+            throw new RuntimeException("API is not available"); // Some fallback logic
+        }
         
         // If not in cache or cache is empty, fetch from API
-        List<NewsArticle> freshArticles = newsAPI.fetchNews(category, 10);
+        List<NewsArticle> freshArticles;
+        try {
+            freshArticles = newsAPI.fetchNews(category, 10);
+        } catch (IllegalArgumentException ex) {
+            throw new RuntimeException("API is not available"); // Some fallback logic
+        }
+
+        if (freshArticles == null) {
+            throw new RuntimeException("API returned null");
+        }
         
         // Cache the results for future requests
         contentCache.cacheArticles(category, freshArticles);
