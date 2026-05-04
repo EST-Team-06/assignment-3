@@ -18,7 +18,7 @@ class NewsAggregatorTest {
     }
 
     @Test
-    public void apiAvailable_returnsArticles() {
+    public void cacheMiss_fetchesFromApi_andCaches() {
         StubNewsAPI stubNewsAPI = new StubNewsAPI(true, false, apiArticles);
         StubContentCacher stubContentCache = new StubContentCacher(null);
 
@@ -31,7 +31,7 @@ class NewsAggregatorTest {
     }
 
     @Test
-    public void apiAvailable_cacheAvailable_returnsCachedArticles() {
+    public void cacheHit_returnsCachedArticles_noApiCall() {
         StubNewsAPI stubNewsAPI = new StubNewsAPI(true, true, apiArticles);
         StubContentCacher stubContentCache = new StubContentCacher(cachedArticles); // Cache available
 
@@ -44,7 +44,20 @@ class NewsAggregatorTest {
     }
 
     @Test
-    public void apiNotAvailable_cacheEmpty_throwsException() {
+    public void cacheEmpty_fetchesFromApi_andCaches() {
+        StubNewsAPI stubNewsAPI = new StubNewsAPI(true, false, apiArticles);
+        StubContentCacher stubContentCache = new StubContentCacher(List.of()); // Empty cache
+
+        NewsAggregator aggregator = new NewsAggregator(stubNewsAPI, stubContentCache);
+        List<NewsArticle> result = aggregator.getLatestNews(CATEGORY);
+
+        assertEquals(result, apiArticles);
+        assertTrue(stubNewsAPI.wasFetchCalled());
+        assertTrue(stubContentCache.getCacheCalled());
+    }
+
+    @Test
+    public void apiUnavailable_cacheMiss_throwsException_beforeFetch() {
         StubNewsAPI stubNewsAPI = new StubNewsAPI(false, true, List.of()); // They state their API is down
         StubContentCacher stubContentCache = new StubContentCacher(null);
 
@@ -56,7 +69,7 @@ class NewsAggregatorTest {
     }
 
     @Test
-    public void apiNotAvailableFromStatus_cacheAvailable_returnsCachedArticles() {
+    public void apiUnavailable_cacheHit_returnsCachedArticles() {
         StubNewsAPI stubNewsAPI = new StubNewsAPI(false, true, List.of()); // They state their API is down
         StubContentCacher stubContentCache = new StubContentCacher(cachedArticles);
 
@@ -69,7 +82,7 @@ class NewsAggregatorTest {
     }
 
     @Test
-    public void apiNotAvailableFromStatus_cacheNotAvailable_throwsException() {
+    public void apiThrows_cacheMiss_throwsException() {
         StubNewsAPI stubNewsAPI = new StubNewsAPI(true, true, List.of()); // They don't state their API is down
         StubContentCacher stubContentCache = new StubContentCacher(null);
 
@@ -82,7 +95,7 @@ class NewsAggregatorTest {
     }
 
     @Test
-    public void apiNotAvailable_cacheAvailable_throwsException() {
+    public void apiThrows_cacheHit_returnsCachedArticles() {
         StubNewsAPI stubNewsAPI = new StubNewsAPI(true, true, List.of()); // They don't state their API is down
         StubContentCacher stubContentCache = new StubContentCacher(cachedArticles);
 
@@ -95,7 +108,7 @@ class NewsAggregatorTest {
     }
 
     @Test
-    public void apiAvailable_articlesNull_throwsException() {
+    public void apiReturnsNull_throwsException() {
         StubNewsAPI stubNewsAPI = new StubNewsAPI(true, false, null);
         StubContentCacher stubContentCache = new StubContentCacher(null);
 
@@ -108,7 +121,7 @@ class NewsAggregatorTest {
     }
 
     @Test
-    public void apiAvailable_categoryNull_throwsException() {
+    public void categoryNull_throwsIllegalArgumentException() {
         StubNewsAPI stubNewsAPI = new StubNewsAPI(true, true, List.of());
         StubContentCacher stubContentCache = new StubContentCacher(List.of());
 
@@ -120,7 +133,7 @@ class NewsAggregatorTest {
     }
 
     @Test
-    public void apiAvailable_categoryEmpty_throwsException() {
+    public void categoryBlank_throwsIllegalArgumentException() {
         StubNewsAPI stubNewsAPI = new StubNewsAPI(true, true, List.of());
         StubContentCacher stubContentCache = new StubContentCacher(List.of());
 
