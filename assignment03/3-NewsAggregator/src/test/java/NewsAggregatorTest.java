@@ -161,7 +161,7 @@ class NewsAggregatorTest {
         public List<NewsArticle> fetchNews(String category, int limit) {
             fetchCalled = true;
             if (throwOnFetch) {
-                throw new IllegalArgumentException("NewsAPI is not available");
+                throw new IllegalArgumentException("Failed to fetch articles from NewsAPI");
             }
             if (!isAvailable()) {
                 throw new IllegalArgumentException("NewsAPI is not available");
