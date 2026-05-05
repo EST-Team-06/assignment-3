@@ -25,4 +25,4 @@
 
 ## Response to Tracking Failures
 * The implementation is almost identical to checking alerts, but we instead make delivery service return `null` rather than an `OrderUpdate`
-* Then we just check if the right alert message is being set.
+* Then we just check if the right alert message is being sent.
