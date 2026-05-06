@@ -13,4 +13,4 @@
 
 ## Advantages
 * B: I did not have to touch the "production code" and was able to still check internal details via `ArgumentCaptor`
-* C: I made the "production code" more observable; making it "easier" to write tests as I did not have to come up with a workaround using `ArgumentCaptor`.
+* C: I made the "production code" more observable; making it "easier" to write tests as I did not have to come up with a workaround using `ArgumentCaptor`. The tests became more readable as well
