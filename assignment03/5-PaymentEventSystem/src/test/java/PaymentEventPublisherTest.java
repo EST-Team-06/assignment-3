@@ -16,6 +16,7 @@ public class PaymentEventPublisherTest {
         paymentEventPublisher.subscribe(listener);
         paymentEventPublisher.publishPaymentSuccess(event);
         verify(listener).onPaymentSuccess(event);
+        assertEquals(1, paymentEventPublisher.listenerCount());
     }
 
     @Test

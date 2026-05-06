@@ -8,9 +8,9 @@
 
 ## Content of invocations - Increasing observability
 * I refactored `EmailService` to return the last seen event to improve observability.
+  * This was technically not necessary, as there was `getLastSentMessage` method but it made easier to implement the test.
 * I then just check if the event I published is the same the `EmailService` listener has seen last.
 
 ## Advantages
 * B: I did not have to touch the "production code" and was able to still check internal details via `ArgumentCaptor`
 * C: I made the "production code" more observable; making it "easier" to write tests as I did not have to come up with a workaround using `ArgumentCaptor`.
-
