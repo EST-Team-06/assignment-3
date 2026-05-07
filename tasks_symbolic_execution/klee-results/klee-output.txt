@@ -1,0 +1,15 @@
+KLEE: output directory is "/home/klee/klee-out-1"
+KLEE: Using Z3 solver backend
+KLEE: ERROR: pow.c:18: ASSERTION FAIL: false
+KLEE: NOTE: now ignoring this error at this location
+KLEE: ERROR: EXITING ON ERROR:
+Error: ASSERTION FAIL: false
+File: pow.c
+Line: 18
+assembly.ll line: 78
+State: 2
+Stack: 
+	#000000078 in pow_client(b=symbolic, e=symbolic) at pow.c:18
+	#100000109 in main() at pow.c:34
+
+
