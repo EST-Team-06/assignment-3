@@ -184,3 +184,292 @@ int bounded_gcd(int a, int b) {
 	return a;
 }
 ```
+
+
+
+## Task 2 - Concolic Execution
+
+Consider the two functions below. The function `my_pow`, written by Bob, is supposed to compute the power $b^e$ for non-negative $e$. Bob’s coworker Alice uses `my_pow` in the `pow_client` method.
+
+Note that mathematically, for any $b \in \mathbb{Z}$ and even $e \in \mathbb{N}_{even}$, $b^e \ge 0$. Alice added an according assertion to `pow_client`.
+
+```c
+int pow_client(int b, int e) {
+    int r = my_pow(b, e);
+    if (e mod 2 == 0) {
+        if (r < 0) {       // (*)
+            assert(false); // should not happen
+        }
+    }
+    return r;
+}
+```
+
+```c
+int my_pow(int b, int e) {
+    int r = b;
+    for (int i = 1; i < e; i++) {
+        r = r * b;
+    }
+    return r;
+}
+
+// incorrect implementation
+```
+
+Unfortunately, Bob’s implementation of `my_pow`contains a bug, which may lead to a violation of Alice’s assertion. In this task, you will use concolic execution to derive a test input for `pow_client` which spots the bug.
+
+a) Perform a first run of `pow_client` using concoliic execution with concrete inputs $b = e = 0$. What is the path constraint gathered during the execution?
+
+**Answer**
+
+
+State 0
+* $\gamma:$
+	* $b \rightarrow 0$
+	* $e \rightarrow 0$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+* $\pi:$
+
+State 1
+* $\gamma:$
+	* $b \rightarrow 0$
+	* $e \rightarrow 0$
+	* $r \rightarrow 0$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow B_0$
+* $\pi:$
+
+State 2
+* $\gamma:$
+	* $b \rightarrow 0$
+	* $e \rightarrow 0$
+	* $r \rightarrow 0$
+	* $i \rightarrow 1$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow B_0$
+	* $i \rightarrow 1$
+* $\pi:$ $1 \geq E_0$
+
+State 3
+* $\gamma:$
+	* $b \rightarrow 0$
+	* $e \rightarrow 0$
+	* $r \rightarrow 0$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow B_0$
+* $\pi:$ $1 \geq E_0$
+
+State 4
+* $\gamma:$
+	* $b \rightarrow 0$
+	* $e \rightarrow 0$
+	* $r \rightarrow 0$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow B_0$
+* $\pi:$ $(1 \geq E_0) \land (E_0 \mod 2 == 0)$
+
+State 5
+* $\gamma:$
+	* $b \rightarrow 0$
+	* $e \rightarrow 0$
+	* $r \rightarrow 0$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow B_0$
+* $\pi:$ $(1 \geq E_0) \land (E_0 \mod 2 == 0) \land (B_0 \geq 0)$
+
+State 6
+* $\gamma:$
+	* $b \rightarrow 0$
+	* $e \rightarrow 0$
+	* $r \rightarrow 0$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow B_0$
+* $\pi:$ $(1 \geq E_0) \land (E_0 \mod 2 == 0) \land (B_0 \geq 0)$
+
+
+b) The previous run entered the (empty) **else** branch of the if-statement `(*)`. Modify the path constraint from before by negating the sub-constraint collected for `(*)`. Then, find a satisfying assignment for the new constraint.
+
+**Answer**
+
+The path constraint from before: 
+
+$\pi:$ $(1 \geq E_0) \land (E_0 \mod 2 == 0) \land (B_0 \geq 0)$
+
+Negating the constraint `(*)`:
+
+* $\pi:$ $(1 \geq E_0) \land (E_0 \mod 2 == 0) \land (B_0 < 0)$
+
+Assignment satisfying the new path constraint:
+
+* $B_0 = -1$
+* $E_0 = 0$
+
+c) Perform a second run using your new inputs from (b). What is the path constraint gathered during the execution? Can you reach the assertion?
+
+**Answer**
+
+State 0
+* $\gamma:$
+	* $b \rightarrow -1$
+	* $e \rightarrow 0$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+* $\pi:$
+
+State 1
+* $\gamma:$
+	* $b \rightarrow -1$
+	* $e \rightarrow 0$
+	* $r \rightarrow -1$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow B_0$
+* $\pi:$
+
+State 2
+* $\gamma:$
+	* $b \rightarrow -1$
+	* $e \rightarrow 0$
+	* $r \rightarrow -1$
+	* $i \rightarrow 1$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow B_0$
+	* $i \rightarrow 1$
+* $\pi:$ $1 \geq E_0$
+
+State 3
+* $\gamma:$
+	* $b \rightarrow -1$
+	* $e \rightarrow 0$
+	* $r \rightarrow -1$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow B_0$
+* $\pi:$ $1 \geq E_0$
+
+State 4
+* $\gamma:$
+	* $b \rightarrow -1$
+	* $e \rightarrow 0$
+	* $r \rightarrow -1$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow B_0$
+* $\pi:$ $(1 \geq E_0) \land (E_0 \mod 2 == 0)$
+
+State 5
+* $\gamma:$
+	* $b \rightarrow -1$
+	* $e \rightarrow 0$
+	* $r \rightarrow -1$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow B_0$
+* $\pi:$ $(1 \geq E_0) \land (E_0 \mod 2 == 0) \land (B_0 < 0)$
+
+State 6
+* $\gamma:$
+	* $b \rightarrow -1$
+	* $e \rightarrow 0$
+	* $r \rightarrow -1$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow B_0$
+* $\pi:$ $(1 \geq E_0) \land (E_0 \mod 2 == 0) \land (B_0 < 0)$
+
+Final path constraint: $(1 \geq E_0) \land (E_0 \mod 2 == 0) \land (B_0 < 0)$
+
+Yes, we can reach the assertion
+
+
+d) Now, assume that the function `my_pow` is part of a library whose source code is not accessible for Alice. This is, she can only execute `my_pow` for concrete inputs. Repeat subtask (a) for this setting.
+
+**Answer**
+
+State 0
+* $\gamma:$
+	* $b \rightarrow 0$
+	* $e \rightarrow 0$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+* $\pi:$
+
+State 1
+* $\gamma:$
+	* $b \rightarrow 0$
+	* $e \rightarrow 0$
+	* $r \rightarrow 0$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow R_0$
+* $\pi:$
+
+State 2
+* $\gamma:$
+	* $b \rightarrow 0$
+	* $e \rightarrow 0$
+	* $r \rightarrow 0$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow R_0$
+* $\pi:$ $E_0 \mod 2 == 0$
+
+State 3
+* $\gamma:$
+	* $b \rightarrow 0$
+	* $e \rightarrow 0$
+	* $r \rightarrow 0$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow R_0$
+* $\pi:$ $(E_0 \mod 2 == 0) \land (R_0 \geq 0)$
+
+State 4
+* $\gamma:$
+	* $b \rightarrow 0$
+	* $e \rightarrow 0$
+	* $r \rightarrow 0$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+	* $r \rightarrow R_0$
+* $\pi:$ $(E_0 \mod 2 == 0) \land (R_0 \geq 0)$
+
+
+e) Can you proceed analogously as in subtasks (b–c) to find inputs violating the assertion? Will concolic execution ever reach the assertion in this example?
+
+**Answer**
+
+No, we cannot proceed analogously as in subtasks (b-c) to find inputs to reach the assertion. In substasks (b-c), we were able to negate the path constraint $B_0 < 0$ resulted from `r < 0`. But this is not possible in this case because we have $R_0 < 0$ instead of $B_0 < 0$ and we don't have control over $R_0$ as `my_pow` is a black-box function
+
+Concolic execution may or may not reach the assertion depending on the concrete inputs. But it will never systematically reach the assertion in this example because SMT solver can't find the correct inputs to satisfy $R_0 < 0$.
+
+
+f) The symbolic execution engine KLEE can be used to perform concolic execution of C code. Use KLEE to generate a test case that exposes the bug from my_pow, using the SMT solver Z3 for solving the path conditions. How many paths does KLEE explore before finding the error? Which are the corresponding test cases produced by KLEE for each of these paths?
