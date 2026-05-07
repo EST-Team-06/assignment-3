@@ -21,7 +21,7 @@ int gcd(int a, int b) {
 // requires: a > 0 && b > 0
 int bounded_gcd(int a, int b) {
 	int c = 0;
-	while (b != 0 && c <= 2) {
+	while (b != 0 && c < 2) {
 		int tmp = b;
 		b = a mod b;
 		a = tmp;
@@ -53,7 +53,7 @@ State 2 (Continue)
 	* $a \rightarrow A_0$ 
 	* $b \rightarrow B_0$ 
 	* $c \rightarrow 0$
-* $\pi$: $B_0 \neq 0 \land c \leq 2$
+* $\pi$: $B_0 \neq 0 \land c < 2$
 * No branching because pre-condition $B_0 > 0$ ensures $B_0 \neq 0$
 
 State 3
@@ -93,7 +93,7 @@ State 7 (Return)
 	* $a \rightarrow B_0$ 
 	* $b \rightarrow (A_0 \mod B_0)$ 
 	* $c \rightarrow 1$ 
-* $\pi$: $(A_0 \mod B_0) = 0 \land c \leq 2$
+* $\pi$: $(A_0 \mod B_0) = 0 \land c < 2$
 * Pre-condition $(A_0 > 0, B_0 > 0)$ does not prevent $(A_0 \mod B_0) = 0$, therefore we have two branches!
 
 
@@ -102,7 +102,7 @@ State 8 (Continue)
 	* $a \rightarrow B_0$ 
 	* $b \rightarrow (A_0 \mod B_0)$ 
 	* $c \rightarrow 1$ 
-* $\pi$: $(A_0 \mod B_0) \neq 0 \land c \leq 2$
+* $\pi$: $(A_0 \mod B_0) \neq 0 \land c < 2$
 
 
 State 9
@@ -142,9 +142,9 @@ State 13 (End)
 	* $a \rightarrow (A_0 \mod B_0)$ 
 	* $b \rightarrow (B_0 \mod (A_0 \mod B_0))$ 
 	* $c \rightarrow 2$ 
-* $\pi$: $c \nleq 2$
+* $\pi$: $c \nless 2$
 * No need to branch
-* Condition $B_0 \mod (A_0 \mod B_0)) \neq 0$ should not be considered as path condition is solely determined by $c$ at this point. 
+* Condition $B_0 \mod (A_0 \mod B_0) \neq 0$ should not be considered as path condition is solely determined by $c$ at this point. 
 
 **c)** Transformation performed in (a) changed behaviour of `gcd` for some inputs. Provide positive values for $a$ and $b$ such that `gcd(a, b)` and `bounded_gcd(a, b)` return different results.
 What does this mean for the output of the symbolic execution? Is it still an under-approximation of the result computed by `gcd`?
@@ -154,7 +154,7 @@ After symbolic execution, we only need to look at $B_0 \mod (A_0 \mod B_0)) \neq
 
 In `bounded_gcd(a, b)`, this condition is irrelevant due to the bound but in real `gcd`, the loop may continue if this condition holds true. 
 
-Therefore, if $A_0=2$ and $B_0=3$, `bounded_gcd` will return $2$ but `gcd` will return $1$
+$A_0=2$ and $B_0=3$ satisfies this condition: $3 \mod (2 \mod 3) = 1 \neq 0$. Therefore, `bounded_gcd` will return $2$ but `gcd` will return $1$.
 
 
 Because `bounded_gcd` returns a result that `gcd` would never return for the same set of inputs, it is not a valid under-approximation. A valid under-approximation would ensure that they behave identical for the same set of inputs. In other words, it needs to be a subset of all execution paths of `gcd` to be an under-approximation. So all bugs found in `bounded_gcd` can also occur in `gcd` but not vice versa. (Otherwise you cannot use `bounded_gcd` as a proxy for `gcd`!)
@@ -163,3 +163,24 @@ Because `bounded_gcd` returns a result that `gcd` would never return for the sam
 *Hint*: Try to rule out executions not possible in `gcd` using path constraints.
 
 **Answer**
+The problem we have in `bounded_gcd` is that we break the loop after 2 iterations at maximum, which leads to incorrect results for some inputs, because the case c=2 artificially terminates the loop. We need to identify these cases and rule them out.
+
+We can look at the value of $b$ when we break the loop, and determine if it artifically terminated the loop. If $b \neq 0$ we can know this was the case:
+
+```c
+// requires: a > 0 && b > 0
+int bounded_gcd(int a, int b) {
+	int c = 0;
+	while (b != 0 && c < 2) {
+		int tmp = b;
+		b = a mod b;
+		a = tmp;
+		c = c + 1;
+	}
+	// Artificially terminated loop, rule out this case
+	if (b != 0) {
+		return -1; // Not possible to reach with gcd
+	}
+	return a;
+}
+```
