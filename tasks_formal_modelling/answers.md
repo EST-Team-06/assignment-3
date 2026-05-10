@@ -31,21 +31,18 @@ abstract sig Student {
 sig GraduateStudent extends Student {}
 sig UndergraduateStudent extends Student {}
 
-fact uniqueStduentIDs {
-    all disj s1, s2 : Student |
-        s1.studentID != s2.studentID
+fact uniqueStudentIDs {
+    all disj s1, s2 : Student | s1.studentID != s2.studentID
 }
 
 fact legal {
-    all s : Student |
-        (some s.university) iff (s.legal = True)
+    all s : Student | (some s.university) iff (s.legal = True)
 }
 
 pred classmates[s1, s2 : Student] {
     s1 != s2
     s1.major = s2.major
     s1.university = s2.university
-
     (
         (s1 in GraduateStudent and s2 in GraduateStudent)
         or
