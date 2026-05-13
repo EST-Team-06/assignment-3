@@ -34,13 +34,13 @@ int bounded_gcd(int a, int b) {
 **b)** Perform symbolic execution on `bounded_gcd` to find all symbolic states with a satisfiable path constraint at return statement. Incorporate precondition in your analysis.
 
 **Answer** 
-State 0
+State 0 `int bounded_gcd(int a, int b)`
 * $\sigma:$ 
 	* $a \rightarrow A_0$
 	* $b \rightarrow B_0$
 * $\pi:$ 
 
-State 1
+State 1 `int c = 0;`
 * $\sigma$: 
 	* $a \rightarrow A_0$ 
 	* $b \rightarrow B_0$ 
@@ -48,15 +48,15 @@ State 1
 * $\pi:$
 
 
-State 2 (Continue)
+State 2 `while (b!=0 && c<=2)` 
 * $\sigma$: 
 	* $a \rightarrow A_0$ 
 	* $b \rightarrow B_0$ 
 	* $c \rightarrow 0$
-* $\pi$: $B_0 \neq 0 \land c < 2$
+* $\pi$: $B_0 \neq 0 \land c \leq 2$
 * No branching because pre-condition $B_0 > 0$ ensures $B_0 \neq 0$
 
-State 3
+State 3 `int tmp = b;`
 * $\sigma$: 
 	* $a \rightarrow A_0$ 
 	* $b \rightarrow B_0$ 
@@ -64,7 +64,7 @@ State 3
 	* $t\rightarrow B_0$
 * $\pi$: 
 
-State 4
+State 4 `b = a mod b;`
 * $\sigma$: 
 	* $a \rightarrow A_0$ 
 	* $b \rightarrow (A_0 \mod B_0)$ 
@@ -72,7 +72,7 @@ State 4
 	* $t\rightarrow B_0$
 * $\pi$:
 
-State 5
+State 5 `a = tmp;`
 * $\sigma$: 
 	* $a \rightarrow B_0$ 
 	* $b \rightarrow (A_0 \mod B_0)$ 
@@ -80,7 +80,7 @@ State 5
 	* $t\rightarrow B_0$
 * $\pi$:
 
-State 6
+State 6 `c = c+1;`
 * $\sigma$: 
 	* $a \rightarrow B_0$ 
 	* $b \rightarrow (A_0 \mod B_0)$ 
@@ -88,24 +88,24 @@ State 6
 	* $t\rightarrow B_0$
 * $\pi$:
 
-State 7 (Return)
+State 7 `	while (b != 0 && c <= 2) {` (Return)
 * $\sigma$: 
 	* $a \rightarrow B_0$ 
 	* $b \rightarrow (A_0 \mod B_0)$ 
 	* $c \rightarrow 1$ 
-* $\pi$: $(A_0 \mod B_0) = 0 \land c < 2$
+* $\pi$: $(A_0 \mod B_0) = 0 \land c \leq 2$
 * Pre-condition $(A_0 > 0, B_0 > 0)$ does not prevent $(A_0 \mod B_0) = 0$, therefore we have two branches!
 
 
-State 8 (Continue)
+State 8 `while (b != 0 && c <= 2) {` (Continue)
 * $\sigma$: 
 	* $a \rightarrow B_0$ 
 	* $b \rightarrow (A_0 \mod B_0)$ 
 	* $c \rightarrow 1$ 
-* $\pi$: $(A_0 \mod B_0) \neq 0 \land c < 2$
+* $\pi$: $(A_0 \mod B_0) \neq 0 \land c \leq 2$
 
 
-State 9
+State 9 `int tmp = b;`
 * $\sigma$: 
 	* $a \rightarrow B_0$ 
 	* $b \rightarrow (A_0 \mod B_0)$ 
@@ -113,7 +113,7 @@ State 9
 	* $t\rightarrow (A_0 \mod B_0)$
 * $\pi$: 
 
-State 10
+State 10 `b = a mod b;`
 * $\sigma$: 
 	* $a \rightarrow B_0$ 
 	* $b \rightarrow (B_0 \mod (A_0 \mod B_0))$ 
@@ -121,7 +121,7 @@ State 10
 	* $t\rightarrow (A_0 \mod B_0)$
 * $\pi$: 
 
-State 11
+State 11 `a = tmp;`
 * $\sigma$: 
 	* $a \rightarrow (A_0 \mod B_0)$ 
 	* $b \rightarrow (B_0 \mod (A_0 \mod B_0))$ 
@@ -129,7 +129,7 @@ State 11
 	* $t\rightarrow (A_0 \mod B_0)$
 * $\pi$: 
 
-State 12
+State 12 `c = c + 1`
 * $\sigma$: 
 	* $a \rightarrow (A_0 \mod B_0)$ 
 	* $b \rightarrow (B_0 \mod (A_0 \mod B_0))$ 
@@ -137,14 +137,15 @@ State 12
 	* $t\rightarrow (A_0 \mod B_0)$
 * $\pi$: 
 
-State 13 (End)
+State 13 `while (b != 0 && c <= 2) {` (End)
 * $\sigma$: 
 	* $a \rightarrow (A_0 \mod B_0)$ 
 	* $b \rightarrow (B_0 \mod (A_0 \mod B_0))$ 
 	* $c \rightarrow 2$ 
-* $\pi$: $c \nless 2$
+* $\pi$: $c \nleq 2$
 * No need to branch
-* Condition $B_0 \mod (A_0 \mod B_0) \neq 0$ should not be considered as path condition is solely determined by $c$ at this point. 
+* Condition $B_0 \mod (A_0 \mod B_0)) \neq 0$ should not be considered as path condition is solely determined by $c$ at this point. 
+
 
 **c)** Transformation performed in (a) changed behaviour of `gcd` for some inputs. Provide positive values for $a$ and $b$ such that `gcd(a, b)` and `bounded_gcd(a, b)` return different results.
 What does this mean for the output of the symbolic execution? Is it still an under-approximation of the result computed by `gcd`?
@@ -223,84 +224,74 @@ a) Perform a first run of `pow_client` using concoliic execution with concrete i
 
 **Answer**
 
-
-State 0
-* $\gamma:$
+State 0 `int pow_client(int b, int e) {`
+* $\gamma$:
 	* $b \rightarrow 0$
 	* $e \rightarrow 0$
-* $\sigma:$ 
-	* $b \rightarrow B_0$
+* $\sigma$:
+	* $b\rightarrow B_0$
 	* $e \rightarrow E_0$
 * $\pi:$
 
-State 1
-* $\gamma:$
+State 1 `int r = my_pow(b, e);` $\rightarrow$ `int my_pow(int b, int e) {` (Looks weird but I think of myself as a debugger now)
+* $\gamma$:
+	* $b \rightarrow 0$
+	* $e \rightarrow 0$
+* $\sigma$: 
+	* $b\rightarrow B_0$
+	* $e \rightarrow E_0$
+* $\pi$:
+
+State 2: `int r = b;`
+* $\gamma$:
 	* $b \rightarrow 0$
 	* $e \rightarrow 0$
 	* $r \rightarrow 0$
-* $\sigma:$ 
-	* $b \rightarrow B_0$
+* $\sigma$: 
+	* $b\rightarrow B_0$
 	* $e \rightarrow E_0$
-	* $r \rightarrow B_0$
-* $\pi:$
+	* $r \rightarrow B_0$ 
+* $\pi$:
 
-State 2
-* $\gamma:$
+State 3: `for (int i = 1; i < e; i++) {`
+* $\gamma$:
 	* $b \rightarrow 0$
 	* $e \rightarrow 0$
 	* $r \rightarrow 0$
 	* $i \rightarrow 1$
-* $\sigma:$ 
+* $\sigma$:
 	* $b \rightarrow B_0$
 	* $e \rightarrow E_0$
 	* $r \rightarrow B_0$
 	* $i \rightarrow 1$
-* $\pi:$ $1 \geq E_0$
+* $\pi$:
+	* $i \geq E_0$ 
+	* Holds always true do to concrete $E_0 = 0$ 
 
-State 3
-* $\gamma:$
+State 4: `int r = my_pow(b, e)` (We saw it in State 1 but now `r` exists!)
+* $\gamma$:
 	* $b \rightarrow 0$
 	* $e \rightarrow 0$
 	* $r \rightarrow 0$
-* $\sigma:$ 
-	* $b \rightarrow B_0$
+* $\sigma$: 
+	* $b\rightarrow B_0$
 	* $e \rightarrow E_0$
-	* $r \rightarrow B_0$
-* $\pi:$ $1 \geq E_0$
+	* $r \rightarrow B_0$ 
+* $\pi$:
 
-State 4
-* $\gamma:$
+State 5: `if (e mod 2 == 0) {`
+* $\gamma$:
 	* $b \rightarrow 0$
 	* $e \rightarrow 0$
 	* $r \rightarrow 0$
-* $\sigma:$ 
+* $\sigma$
 	* $b \rightarrow B_0$
 	* $e \rightarrow E_0$
 	* $r \rightarrow B_0$
-* $\pi:$ $(1 \geq E_0) \land (E_0 \mod 2 == 0)$
-
-State 5
-* $\gamma:$
-	* $b \rightarrow 0$
-	* $e \rightarrow 0$
-	* $r \rightarrow 0$
-* $\sigma:$ 
-	* $b \rightarrow B_0$
-	* $e \rightarrow E_0$
-	* $r \rightarrow B_0$
-* $\pi:$ $(1 \geq E_0) \land (E_0 \mod 2 == 0) \land (B_0 \geq 0)$
-
-State 6
-* $\gamma:$
-	* $b \rightarrow 0$
-	* $e \rightarrow 0$
-	* $r \rightarrow 0$
-* $\sigma:$ 
-	* $b \rightarrow B_0$
-	* $e \rightarrow E_0$
-	* $r \rightarrow B_0$
-* $\pi:$ $(1 \geq E_0) \land (E_0 \mod 2 == 0) \land (B_0 \geq 0)$
-
+* $\pi$: 
+	* $E_0 \mod 2 = 0$
+	* Holds due to concrete values. 
+	* Return $r$ as 0
 
 b) The previous run entered the (empty) **else** branch of the if-statement `(*)`. Modify the path constraint from before by negating the sub-constraint collected for `(*)`. Then, find a satisfying assignment for the new constraint.
 
