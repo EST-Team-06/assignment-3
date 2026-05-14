@@ -314,7 +314,7 @@ c) Perform a second run using your new inputs from (b). What is the path constra
 
 **Answer**
 
-State 0
+State 0 `int pow_client(int b, int e) {`
 * $\gamma:$
 	* $b \rightarrow -1$
 	* $e \rightarrow 0$
@@ -323,7 +323,16 @@ State 0
 	* $e \rightarrow E_0$
 * $\pi:$
 
-State 1
+State 1 `ìnt r = my_pow(b,e) -> int my_pow(int b, int e) {`
+* $\gamma:$
+	* $b \rightarrow -1$
+	* $e \rightarrow 0$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+* $\pi:$
+
+State 2 `int r = b`
 * $\gamma:$
 	* $b \rightarrow -1$
 	* $e \rightarrow 0$
@@ -334,7 +343,7 @@ State 1
 	* $r \rightarrow B_0$
 * $\pi:$
 
-State 2
+State 3 `for (int i=1; i<e; i++) {`
 * $\gamma:$
 	* $b \rightarrow -1$
 	* $e \rightarrow 0$
@@ -346,8 +355,9 @@ State 2
 	* $r \rightarrow B_0$
 	* $i \rightarrow 1$
 * $\pi:$ $1 \geq E_0$
+* Condition fulfilled
 
-State 3
+State 4 `r = my_pow(b, e);`
 * $\gamma:$
 	* $b \rightarrow -1$
 	* $e \rightarrow 0$
@@ -356,9 +366,9 @@ State 3
 	* $b \rightarrow B_0$
 	* $e \rightarrow E_0$
 	* $r \rightarrow B_0$
-* $\pi:$ $1 \geq E_0$
+* $\pi:$
 
-State 4
+State 5 `if (e mod 2 == 0) {`
 * $\gamma:$
 	* $b \rightarrow -1$
 	* $e \rightarrow 0$
@@ -368,8 +378,9 @@ State 4
 	* $e \rightarrow E_0$
 	* $r \rightarrow B_0$
 * $\pi:$ $(1 \geq E_0) \land (E_0 \mod 2 == 0)$
+* Condition fulfilled, continue
 
-State 5
+State 5 `if (r < 0) {`
 * $\gamma:$
 	* $b \rightarrow -1$
 	* $e \rightarrow 0$
@@ -380,7 +391,7 @@ State 5
 	* $r \rightarrow B_0$
 * $\pi:$ $(1 \geq E_0) \land (E_0 \mod 2 == 0) \land (B_0 < 0)$
 
-State 6
+State 6 `assert(false)` (done)
 * $\gamma:$
 	* $b \rightarrow -1$
 	* $e \rightarrow 0$
@@ -400,7 +411,7 @@ d) Now, assume that the function `my_pow` is part of a library whose source code
 
 **Answer**
 
-State 0
+State 0 `int pow_client(int b, int e) {`
 * $\gamma:$
 	* $b \rightarrow 0$
 	* $e \rightarrow 0$
@@ -409,7 +420,16 @@ State 0
 	* $e \rightarrow E_0$
 * $\pi:$
 
-State 1
+State 1 `int r = my_pow(b, e) -> int my_pow(int b, int e) {`
+* $\gamma:$
+	* $b \rightarrow 0$
+	* $e \rightarrow 0$
+* $\sigma:$ 
+	* $b \rightarrow B_0$
+	* $e \rightarrow E_0$
+* $\pi:$
+
+State 2 `int r = b;`
 * $\gamma:$
 	* $b \rightarrow 0$
 	* $e \rightarrow 0$
@@ -420,7 +440,7 @@ State 1
 	* $r \rightarrow R_0$
 * $\pi:$
 
-State 2
+State 3 `if (e mod 2 == 0) {`
 * $\gamma:$
 	* $b \rightarrow 0$
 	* $e \rightarrow 0$
@@ -431,7 +451,7 @@ State 2
 	* $r \rightarrow R_0$
 * $\pi:$ $E_0 \mod 2 == 0$
 
-State 3
+State 4 `if (r < 0) {`
 * $\gamma:$
 	* $b \rightarrow 0$
 	* $e \rightarrow 0$
@@ -442,7 +462,7 @@ State 3
 	* $r \rightarrow R_0$
 * $\pi:$ $(E_0 \mod 2 == 0) \land (R_0 \geq 0)$
 
-State 4
+State 5 `return r;`
 * $\gamma:$
 	* $b \rightarrow 0$
 	* $e \rightarrow 0$
