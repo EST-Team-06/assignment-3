@@ -2,7 +2,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
@@ -60,8 +60,16 @@ class SocialMediaPosterTest {
     @Test
     public void postBatch_singlePlatform_returnsOne() {
         SocialMediaPoster poster = new SocialMediaPoster(new SocialMediaAPI());
-        int result = poster.postBatch(List.of("Twitter"), "Hello world");
+        int result = poster.postBatch(Arrays.asList("Twitter"), "Hello world");
 
         assertEquals(1, result);
+    }
+
+    @Test
+    public void postBatch_multiplePlatforms_returnsCorrectCount() {
+        SocialMediaPoster poster = new SocialMediaPoster(new SocialMediaAPI());
+        int result = poster.postBatch(Arrays.asList("Twitter", null, "", "Instagram", "Facebook"), "Hello world");
+
+        assertEquals(3, result);
     }
 }

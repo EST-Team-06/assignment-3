@@ -34,8 +34,15 @@ public class SocialMediaPoster {
      * @return number of successful posts
      */
     public int postBatch(List<String> platforms, String content) {
-        String platform = platforms.get(0);
-
-        return postContent(platform, content) ? 1 : 0;
+        int failedPosts = 0;
+        for (String platform : platforms) {
+            try {
+                postContent(platform, content);
+            } catch (IllegalArgumentException e) {
+                System.err.println("Failed to post to " + platform + ": " + e.getMessage());
+                failedPosts++;
+            }
+        }
+        return platforms.size() - failedPosts;
     }
 }

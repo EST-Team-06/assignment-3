@@ -33,8 +33,8 @@
 *1. Iteration: Happy Test*
 - I first started with the test case with a batch that only contains one platform:
     - `postBatch(["Twitter"], "Hello World") == 1`
-    - I only extracted the first (only) element from the platforms list, and called `postContent`
-    - I then returned `1` or `0` depending on the success of `postContent`
+- I only extracted the first (only) element from the platforms list, and called `postContent`
+- I then returned `1` or `0` depending on the success of `postContent`
 
     ```java
     @Test
@@ -42,5 +42,33 @@
         String platform = platforms.get(0);
 
         return postContent(platform, content) ? 1 : 0;
+    }
+    ```
+
+*2. Iteration: Handling Invalid Platforms*
+- Even though `postContent` handles the posting the content to a individual platform, we need to keep count of successful posts
+- I added the following test case:
+    ```python
+    postBatch(
+        ["Twitter", null, "", "Instagram", "Facebook"], "Hello World"
+    ) == 3
+    ```
+- I slightly had to refactor the test code as well, because `List.of()` raises an exception when having at least one `null`. I changed it to `Arrays.asList()`
+- I also had to refactor the production code to introduce looping over the list, and added a counter for failure
+- At the end I returned `listSize - failureCount`
+
+    ```java
+    @Test
+    public int postBatch(List<String> platforms, String content) {
+        int failedPosts = 0;
+        for (String platform : platforms) {
+            try {
+                postContent(platform, content);
+            } catch (IllegalArgumentException e) {
+                System.err.println("Failed to post to " + platform + ": " + e.getMessage());
+                failedPosts++;
+            }
+        }
+        return platforms.size() - failedPosts;
     }
     ```
