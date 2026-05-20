@@ -1,7 +1,6 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -11,49 +10,32 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.junit.jupiter.api.Test;
 
 class SocialMediaPosterTest {
 
-    @Test
-    public void platformNull_throwsIllegalArgumentException() {
-        SocialMediaPoster poster = new SocialMediaPoster(new SocialMediaAPI());
-        assertThrows(IllegalArgumentException.class, () -> {
-            poster.postContent(null, "Some content");
-        });
+    private static Stream<Arguments> provideInvalidInputs() {
+        return Stream.of(
+            Arguments.of(null,              "Some content"),
+            Arguments.of("",                "Some content"),
+            Arguments.of("Some platform",   null),
+            Arguments.of("Some platform",   ""),
+            Arguments.of("Some platform",   "x".repeat(281))
+        );
     }
 
-    @Test
-    public void platformEmpty_throwsIllegalArgumentException() {
+    @ParameterizedTest
+    @MethodSource("provideInvalidInputs")
+    public void invalidInputs_throwsIllegalArgumentException(String platform, String content) {
         SocialMediaPoster poster = new SocialMediaPoster(new SocialMediaAPI());
         assertThrows(IllegalArgumentException.class, () -> {
-            poster.postContent("", "Some content");
-        });
-    }
-
-    @Test
-    public void contentNull_throwsIllegalArgumentException() {
-        SocialMediaPoster poster = new SocialMediaPoster(new SocialMediaAPI());
-        assertThrows(IllegalArgumentException.class, () -> {
-            poster.postContent("Some platform", null);
-        });
-    }
-
-    @Test
-    public void contentEmpty_throwsIllegalArgumentException() {
-        SocialMediaPoster poster = new SocialMediaPoster(new SocialMediaAPI());
-        assertThrows(IllegalArgumentException.class, () -> {
-            poster.postContent("Some platform", "");
-        });
-    }
-
-    @Test
-    public void contentTooLong_throwsIllegalArgumentException() {
-        SocialMediaPoster poster = new SocialMediaPoster(new SocialMediaAPI());
-        String longContent = "x".repeat(281); // Boundary testing with 281 characters
-        assertThrows(IllegalArgumentException.class, () -> {
-            poster.postContent("Some platform", longContent);
+            poster.postContent(platform, content);
         });
     }
 
@@ -65,6 +47,7 @@ class SocialMediaPosterTest {
         assertTrue(result);
     }
 
+    // TDD tests for postBatch
     @Test
     public void postBatch_singlePlatform_returnsOne() {
         SocialMediaPoster poster = new SocialMediaPoster(new SocialMediaAPI());
