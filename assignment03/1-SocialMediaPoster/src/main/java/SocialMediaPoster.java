@@ -34,7 +34,8 @@ public class SocialMediaPoster {
      * @return number of successful posts
      */
     public int postBatch(List<String> platforms, String content) {
-        // TODO: Implement using TDD
-        throw new UnsupportedOperationException("Not yet implemented - implement using TDD");
+        String platform = platforms.get(0);
+
+        return postContent(platform, content) ? 1 : 0;
     }
 }

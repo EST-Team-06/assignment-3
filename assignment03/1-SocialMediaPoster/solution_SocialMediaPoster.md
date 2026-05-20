@@ -28,3 +28,19 @@
 - Another similar disadvantage is if the real implementation interface changes (e.g. its parameters or its method name), our mocks will not capture that automatically and require a manual adjustment. Our tests will again artifically pass
 
 
+## Implementing `postBatch` with TDD
+
+*1. Iteration: Happy Test*
+- I first started with the test case with a batch that only contains one platform:
+    - `postBatch(["Twitter"], "Hello World") == 1`
+    - I only extracted the first (only) element from the platforms list, and called `postContent`
+    - I then returned `1` or `0` depending on the success of `postContent`
+
+    ```java
+    @Test
+    public int postBatch(List<String> platforms, String content) {
+        String platform = platforms.get(0);
+
+        return postContent(platform, content) ? 1 : 0;
+    }
+    ```
