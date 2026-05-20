@@ -72,4 +72,12 @@ class SocialMediaPosterTest {
 
         assertEquals(3, result);
     }
+
+    @Test
+    public void postBatch_invalidContent_returnsZero() {
+        SocialMediaPoster poster = new SocialMediaPoster(new SocialMediaAPI());
+        int result = poster.postBatch(Arrays.asList("Twitter", null, "", "Instagram", "Facebook"), "");
+
+        assertEquals(0, result);
+    }
 }

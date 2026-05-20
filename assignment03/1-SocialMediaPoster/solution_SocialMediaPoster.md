@@ -37,7 +37,6 @@
 - I then returned `1` or `0` depending on the success of `postContent`
 
     ```java
-    @Test
     public int postBatch(List<String> platforms, String content) {
         String platform = platforms.get(0);
 
@@ -58,7 +57,6 @@
 - At the end I returned `listSize - failureCount`
 
     ```java
-    @Test
     public int postBatch(List<String> platforms, String content) {
         int failedPosts = 0;
         for (String platform : platforms) {
@@ -70,5 +68,24 @@
             }
         }
         return platforms.size() - failedPosts;
+    }
+    ```
+
+*3. Iteration: Handling Invalid Content*
+- I also need to handle the invalid content. In the case of invalid content, regardless of if the platforms are valid or not, all posts in the batch can't be posted so the method should return 0
+- I added the following test case:
+    ```python
+    postBatch(
+        ["Twitter", "null", "", "Instagram", "Facebook"], ""
+    ) == 0
+    ```
+- I just handle this case by adding a condition at the beginning. If the content is invalid I early return 0 
+
+    ```java
+    public int postBatch(List<String> platforms, String content) {
+        if (content == null || content.trim().isEmpty() || content.length() > 280) {
+            return 0;
+        }
+        // The rest of the method
     }
     ```

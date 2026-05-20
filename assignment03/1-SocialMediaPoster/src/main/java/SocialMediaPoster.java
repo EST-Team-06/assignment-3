@@ -34,6 +34,9 @@ public class SocialMediaPoster {
      * @return number of successful posts
      */
     public int postBatch(List<String> platforms, String content) {
+        if (content == null || content.trim().isEmpty() || content.length() > 280) {
+            return 0;
+        }
         int failedPosts = 0;
         for (String platform : platforms) {
             try {
