@@ -128,6 +128,14 @@
     - And I make the method return the current count if it reached to the limit, and not post any more to the remaining platforms
     - I increased its count only if `api.post()` returned true. While it returns true at the moment by default this is likely not be the case in its real implementation
 
+*6. Iteration: Handling API unavailability*
+- So far, I assumed API would always be available, so I also need to handle the cases where we woudln't keep trying forever if the api calls don't succeeed
+    ```python
+    postBatch(
+        [...(42 unsuccessfull calls), "Facebook"], "Hello World"
+    ) == 0
+    ```
+- 
 
 ## Questions for `postBatch`
 
