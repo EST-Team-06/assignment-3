@@ -30,7 +30,19 @@
 
 ## Implementing `postBatch` with TDD
 
-*1. Iteration: Happy Test*
+*1. Iteration: Empty List*
+- I first started with a very basic case: empty list of platforms should return 0
+- I only had to return 0 to make the following test pass:
+    ```java
+    @Test
+    public void postBatch_emptyPlatforms_returnsZero() {
+        int result = poster.postBatch(Collections.emptyList(), "Hello world");
+
+        assertEquals(0, result);
+    }
+    ```
+
+*2. Iteration: Happy Test*
 - I first started with the test case with a batch that only contains one platform:
     - `postBatch(["Twitter"], "Hello World") == 1`
 - I only extracted the first (only) element from the platforms list, and called `postContent`
@@ -38,13 +50,16 @@
 
     ```java
     public int postBatch(List<String> platforms, String content) {
+        if (platforms.isEmpty()) {
+            return 0;
+        }
         String platform = platforms.get(0);
 
         return postContent(platform, content) ? 1 : 0;
     }
     ```
 
-*2. Iteration: Handling Invalid Platforms*
+*3. Iteration: Handling Invalid Platforms*
 - Even though `postContent` handles the posting the content to a individual platform, we need to keep count of successful posts
 - I added the following test case:
     ```python
@@ -71,7 +86,7 @@
     }
     ```
 
-*3. Iteration: Handling Invalid Content*
+*4. Iteration: Handling Invalid Content*
 - I also need to handle the invalid content. In the case of invalid content, regardless of if the platforms are valid or not, all posts in the batch can't be posted so the method should return 0
 - I added the following test case:
     ```python
@@ -90,7 +105,7 @@
     }
     ```
 
-*4. Iteration: Handling API Limit*
+*5. Iteration: Handling API Limit*
 - So far, I handled the basic functionality but, didn't consider the API limit so I add the following tests:
     ```python
     postBatch(
@@ -98,7 +113,7 @@
     ) == 42
     ```
     ```java
-    verify(poster, never()).postContent("Facebook", "Hello world");
+    verify(api, never()).post("Facebook", "Hello World");
     ```
     ```python
     postBatch(
@@ -106,21 +121,21 @@
     ) == 42
     ```
     ```java
-    verify(poster, times(1)).postContent("Facebook", "Hello world");
+    verify(api, times(1)).post("Facebook", "Hello World");
     ```
 - To make these tests pass, I did the following refactorings:
     - To get the successfully posted post count, I changed the logic from `listSize - failureCount` to `successCount`
     - And I make the method return the current count if it reached to the limit, and not post any more to the remaining platforms
-    - I increased its count only if `api.post()` returned true. While it always returns true at the moment this is likely not be the case in its real implementation
+    - I increased its count only if `api.post()` returned true. While it returns true at the moment by default this is likely not be the case in its real implementation
 
 
 ## Questions for `postBatch`
 
-- The answers stay mostly quite the same, as `postBatch` doesn't call any external dependency itself, it uses api calls indirectly through `postContent()`
+- The answers stay mostly quite the same, as `postBatch` uses the same external dependency as `postContent`
 
 1. What are the external dependencies? Which of these dependencies should be tested using doubles and which should not? Explain your rationale.
 
-- The only external dependency is still the `api` variable of type `SocialMediaAPI` and its `post` method is used in `postContent()`. It should be testing using doubles to avoid really depend on the real api
+- The only external dependency is still the `api` variable of type `SocialMediaAPI` and its `post` method is used in `postContent()`. Additionally `getRateLimitRemaining()` is directly used in this function. It should be testing using doubles to avoid really depend on the real api
 
 2. For the dependencies that should be tested using doubles, should the production code be refactored to make it possible? If so, do the refactoring and implement the tests.
 
