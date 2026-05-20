@@ -89,3 +89,26 @@
         // The rest of the method
     }
     ```
+
+*4. Iteration: Handling API Limit*
+- So far, I handled the basic functionality but, didn't consider the API limit so I add the following tests:
+    ```python
+    postBatch(
+        [...(42 platforms), "Facebook"], "Hello World"
+    ) == 42
+    ```
+    ```java
+    verify(poster, never()).postContent("Facebook", "Hello world");
+    ```
+    ```python
+    postBatch(
+        [...(42 platforms with one of them being invalid), "Facebook"], "Hello World"
+    ) == 42
+    ```
+    ```java
+    verify(poster, times(1)).postContent("Facebook", "Hello world");
+    ```
+- To make these tests pass, I did the following refactorings:
+    - To get the successfully posted post count, I changed the logic from `listSize - failureCount` to `successCount`
+    - And I make the method return the current count if it reached to the limit, and not post any more to the remaining platforms
+    - I increased its count only if `api.post()` returned true. While it always returns true at the moment this is likely not be the case in its real implementation

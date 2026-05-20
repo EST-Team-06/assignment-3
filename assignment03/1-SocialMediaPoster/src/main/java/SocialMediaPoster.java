@@ -37,15 +37,23 @@ public class SocialMediaPoster {
         if (content == null || content.trim().isEmpty() || content.length() > 280) {
             return 0;
         }
-        int failedPosts = 0;
+        int postLimit = api.getRateLimitRemaining();
+        int successfulPosts = 0;
+
         for (String platform : platforms) {
+            if (successfulPosts >= postLimit) {
+                System.err.println("Rate limit reached");
+                return successfulPosts;
+            }
+
             try {
-                postContent(platform, content);
+                if (postContent(platform, content)) {
+                    successfulPosts++;
+                }
             } catch (IllegalArgumentException e) {
                 System.err.println("Failed to post to " + platform + ": " + e.getMessage());
-                failedPosts++;
             }
         }
-        return platforms.size() - failedPosts;
+        return successfulPosts;
     }
 }
