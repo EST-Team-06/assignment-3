@@ -70,5 +70,10 @@ run show for exactly 2 University,
 In the Alloy visualization, classmates are now visible because they are present as an attribute of the student. If we had used the predicate alone, even if alloy had enforced it, it did not visualize it.
 * Note: If you re-run this Alloy code, you may have to run it several times as Alloy can generate cases with 3 students, 3 students ids and 3 majors but no classmates.
 
+## Task 2a
+Since `but 1 UZHBusStation` from `run show for 2 but 1 UZHBusStation`, only one UZH Bus Station can exist. Since there exists only one UZH Bus Station, each name `ZurichCity`, `Irchel`, `Oerlikon`, and `Schlieren` must point to this one station. Since `all s: UZHBusStation | UZHBusStation in s.^next and some s.next`, all bus stations must be reachable from every station through next and according to `next: set UZHBusStation`, each station must have a next station. However, since there is only one UZH Bus Station, the only way to do it is to have a self-loop. Since `all b1, b2: UZHBus | b1.station != b2.station`, UZHBus must be empty because this rule includes the case `b1 = b2`, which would require a bus's station to differ from itself, which is impossible.
+
+![Visualisation using app.diagrams.net](task-2a.png)
+
 ### Use of AI
-Since Alloy syntax is very new, AI was used to help better understanding syntax. Everything written in Alloy code is explainable by us.
+Since Alloy syntax is very new, AI was used to help better understanding syntax. In a specific case, Claude has been consulted to explain the intricates of the `all b1, b2: UZHBus | b1.station != b2.station` predicate. Everything written in Alloy code is explainable by us. 
