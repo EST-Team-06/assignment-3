@@ -75,5 +75,49 @@ Since `but 1 UZHBusStation` from `run show for 2 but 1 UZHBusStation`, only one 
 
 ![Visualisation using app.diagrams.net](task-2a.png)
 
+## Task 2b
+* (i) There are exactly 4 UZHBusStations: ZurichCity, Irchel, Oerlikon, and Schlieren.
+
+    *Change `in` from `one sig ZurichCity, Irchel, Oerlikon, Schlieren in UZHBusStation {}` to `extends`. `extends` makes the four named sigs disjoint, so we have exactly 4 UZHBusStations, as required.*
+
+* (ii) The UZHBusStations form one directed circle.
+
+    *Change `set` in `next: set UZHBusStation` to `one`. This ensures that each station has exactly one successor.*
+
+* (iii) There is no UZHBusStation between Oerlikon and Schlieren.
+
+    *Change `no (Oerlikon - Schlieren)` to `Oerlikon.next = Schlieren`.*
+
+* (iv) There can be at most one UZHBus at each UZHBusStation.
+
+    *Add `disj` to `all b1, b2: UZHBus | b1.station != b2.station` to fix the subtlety of implicating `b1 = b2`, which has required a bus's station to differ from itself, which is impossible.*
+
+* (v) There is at least one UZHBus.
+
+    *Add `some UZHBus` as a fact.*
+
+Therefore, the final Alloy model looks like this:
+```
+sig UZHBusStation {
+    next: one UZHBusStation
+}
+
+one sig ZurichCity, Irchel, Oerlikon, Schlieren extends UZHBusStation {}
+
+sig UZHBus {
+    station: lone UZHBusStation
+}
+
+fact {
+    Oerlikon.next = Schlieren
+    all s: UZHBusStation | UZHBusStation in s.^next and some s.next
+    all disj b1, b2: UZHBus | b1.station != b2.station
+    some UZHBus
+}
+
+pred show {}
+run show for 4
+```
+
 ### Use of AI
 Since Alloy syntax is very new, AI was used to help better understanding syntax. In a specific case, Claude has been consulted to explain the intricates of the `all b1, b2: UZHBus | b1.station != b2.station` predicate. Everything written in Alloy code is explainable by us. 
