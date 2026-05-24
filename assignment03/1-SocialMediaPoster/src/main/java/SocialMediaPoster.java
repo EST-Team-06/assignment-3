@@ -34,7 +34,31 @@ public class SocialMediaPoster {
      * @return number of successful posts
      */
     public int postBatch(List<String> platforms, String content) {
-        // TODO: Implement using TDD
-        throw new UnsupportedOperationException("Not yet implemented - implement using TDD");
+        if (content == null || content.trim().isEmpty() || content.length() > 280) {
+            return 0;
+        }
+
+        int apiLimit = api.getRateLimitRemaining();
+        int successfulPosts = 0;
+        int apiCalls = 0;
+
+        for (String platform : platforms) {
+            if (apiCalls >= apiLimit) {
+                System.err.println("Rate limit reached");
+                return successfulPosts;
+            }
+
+            try {
+                boolean wasSuccessful = postContent(platform, content);
+                apiCalls++;
+                
+                if (wasSuccessful) {
+                    successfulPosts++;
+                }
+            } catch (IllegalArgumentException e) {
+                System.err.println("Failed to post to " + platform + ": " + e.getMessage());
+            }
+        }
+        return successfulPosts;
     }
 }
