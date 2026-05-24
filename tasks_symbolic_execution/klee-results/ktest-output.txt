@@ -1,0 +1,17 @@
+ktest file : 'klee-last/test000001.ktest'
+args       : ['pow.bc']
+num objects: 2
+object 0: name: 'b'
+object 0: size: 4
+object 0: data: b'\xff\xff\xff\xff'
+object 0: hex : 0xffffffff
+object 0: int : -1
+object 0: uint: 4294967295
+object 0: text: ....
+object 1: name: 'e'
+object 1: size: 4
+object 1: data: b'\x00\x00\x00\x00'
+object 1: hex : 0x00000000
+object 1: int : 0
+object 1: uint: 0
+object 1: text: ....
