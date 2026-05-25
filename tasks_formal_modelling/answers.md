@@ -21,7 +21,10 @@ one sig True, False extends Bool {}
 sig University {}
 sig Major {}
 sig StudentID {}
+```
 
+
+```
 abstract sig Student {
     studentID  : one StudentID,
     legal      : one Bool,
@@ -32,7 +35,9 @@ abstract sig Student {
 
 sig GraduateStudent extends Student {}
 sig UndergraduateStudent extends Student {}
+```
 
+```
 fact uniqueStudentIDs {
     all disj s1, s2 : Student | s1.studentID != s2.studentID
 }
@@ -40,7 +45,9 @@ fact uniqueStudentIDs {
 fact legalFact {
     all s : Student | (some s.university) iff (s.legal = True)
 }
+```
 
+```
 fact classmatesFact {
     all s : Student | s.classmates = { other : Student | validClassmates[s, other] }
 }
@@ -55,8 +62,9 @@ pred validClassmates[s1, s2 : Student] {
         (s1 in UndergraduateStudent and s2 in UndergraduateStudent)
     )
 }
+```
 
-
+```
 pred show {}
 run show for exactly 2 University,
            exactly 3 Major,

@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RealNewsAPI implements NewsAPI {
 
@@ -26,7 +27,8 @@ public class RealNewsAPI implements NewsAPI {
 
         return articles.stream()
                 .limit(limit)
-                .toList();
+                .collect(Collectors.toList());
+        // NOTE: We use this for Java 11, for 16, we can directly do toList()
     }
 
     @Override
