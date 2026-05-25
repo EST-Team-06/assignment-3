@@ -1,6 +1,6 @@
 # Social Media Poster
 
-## Unittests
+## Unit Tests
 
 - I first started by writing test cases for the `postContent` method of the `SocialMediaPoster` class
 - My [test suite](src/test/java/SocialMediaPosterTest.java) included:
@@ -30,7 +30,7 @@
 
 ## Implementing `postBatch` with TDD
 
-*1. Iteration: Empty List*
+**1. Iteration: Empty List**
 - I first started with a very basic case: empty list of platforms should return 0
 - I only had to return 0 to make the following test pass:
     ```java
@@ -42,7 +42,7 @@
     }
     ```
 
-*2. Iteration: Happy Test*
+**2. Iteration: Happy Test**
 - I first started with the test case with a batch that only contains one platform:
     - `postBatch(["Twitter"], "Hello World") == 1`
 - I only extracted the first (only) element from the platforms list, and called `postContent`
@@ -59,7 +59,7 @@
     }
     ```
 
-*3. Iteration: Handling Invalid Platforms*
+**3. Iteration: Handling Invalid Platforms**
 - Even though `postContent` handles the posting the content to a individual platform, we need to keep count of successful posts
 - I added the following test case:
     ```python
@@ -86,7 +86,7 @@
     }
     ```
 
-*4. Iteration: Handling Invalid Content*
+**4. Iteration: Handling Invalid Content**
 - I also need to handle the invalid content. In the case of invalid content, regardless of if the platforms are valid or not, all posts in the batch can't be posted so the method should return 0
 - I added the following test case:
     ```python
@@ -105,7 +105,7 @@
     }
     ```
 
-*5. Iteration: Handling API Limit*
+**5. Iteration: Handling API Limit**
 - So far, I handled the basic functionality but, didn't consider the API limit so I add the following tests:
     ```python
     postBatch(
@@ -128,7 +128,7 @@
     - And I make the method return the current count if it reached to the limit, and not post any more to the remaining platforms
     - I increased its count only if `api.post()` returned true. While it returns true at the moment by default it might also return false when it's down
 
-*6. Iteration: Handling Unsuccessful API Calls*
+**6. Iteration: Handling Unsuccessful API Calls**
 - So far, I assumed API would always be available, so I also need to handle the cases where we wouldn't keep trying forever if the api calls don't succeed
     ```python
     postBatch(
